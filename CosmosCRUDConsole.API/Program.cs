@@ -1,7 +1,11 @@
 ﻿using CosmosCRUDConsole.API.Models;
+using CosmosCRUDConsole.API.Services;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 //This demo dives into leveraging Cosmos SDK to;
 //- create databases and collections
@@ -51,14 +55,19 @@ namespace CosmosCRUDConsole.API
             Console.WriteLine("The document has been created with the ID:  " + itemResult.Resource.Id);
 
 
-            // READING DATA....targeted db, collection and id of data to read provided
-            var document = client.ReadDocumentAsync<Castle>(
-                UriFactory.CreateDocumentUri(DatabaseId, CastlesCollection, itemResult.Resource.Id)).Result;
+            // READING DATA....USING STRING QUERY
 
-            // convert db document result to Castle POCO
-            Castle castle = (dynamic)document;      // "dynamic" does magic  ;-)
+            var cosmosService = new CosmosService<Castle>
+            {
+                DocumentClient = client,
+                DatabaseId = DatabaseId,
+                CollectionId = CastlesCollection
+            };
 
-            Console.WriteLine("Castle retrieved: " + castle);
+            var castle = cosmosService.GetItemsAsync(e => e.Name == "Elmina Castle").Result;
+
+            string c = string.Join(",", castle);
+            Console.WriteLine(c);
 
         }
     }
