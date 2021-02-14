@@ -33,26 +33,22 @@ namespace CosmosCRUDConsole.API
                     ConnectionProtocol = Protocol.Tcp
                 });
 
-            // Create a new db in cosmos
-            var dbCreationResult = client.CreateDatabaseIfNotExistsAsync(new Database { Id = DatabaseId }).Result;  // .Result makes it sync
+            // Set up database and collection Uris
+            var databaseUri = UriFactory.CreateDatabaseUri(DatabaseId);
+            var castleCollectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseId, CastlesCollection);
+            var castlesCollection = new DocumentCollection { Id = CastlesCollection };
 
-            Console.WriteLine("The database Id created is: " + dbCreationResult.Resource.Id);
+            // Create a new db in cosmos
+            client.CreateDatabaseIfNotExistsAsync(new Database { Id = DatabaseId }).Wait();  // .Result makes it sync
 
             // Create new Container(Collection/Table) inside db to store Landmarks
-            var collectionCreationResult = client.CreateDocumentCollectionIfNotExistsAsync(
-                UriFactory.CreateDatabaseUri(DatabaseId), 
-                new DocumentCollection { Id = CastlesCollection }).Result;
+             client.CreateDocumentCollectionIfNotExistsAsync(databaseUri, castlesCollection).Wait(); ;
 
-            Console.WriteLine("The collection created has the ID: " + collectionCreationResult.Resource.Id);
 
             // Create Item/Document/Row in Collection to be stored...specifying db and collection to target
             var elCastle = new Castle { Name = "Elmina Castle" };
 
-            var itemResult = client.CreateDocumentAsync(
-                UriFactory.CreateDocumentCollectionUri(DatabaseId, CastlesCollection),
-                elCastle).Result;
-
-            Console.WriteLine("The document has been created with the ID:  " + itemResult.Resource.Id);
+            client.CreateDocumentAsync(castleCollectionUri, elCastle).Wait();
 
 
             // READING DATA....USING STRING QUERY
@@ -64,11 +60,12 @@ namespace CosmosCRUDConsole.API
                 CollectionId = CastlesCollection
             };
 
-            var castle = cosmosService.GetItemsAsync(e => e.Name == "Elmina Castle").Result;
+            var castles = cosmosService.GetItemsAsync(e => e.Name == "Elmina Castle").Result;
+            Console.WriteLine("BEFORE 4EACH");
+            castles.ToList().ForEach(Console.WriteLine);
 
-            string c = string.Join(",", castle);
-            Console.WriteLine(c);
-
+            var castleMatches = cosmosService.GetItemsAsync(e => e.Name.StartsWith("El")).Result;
+            castleMatches.ToList().ForEach(Console.WriteLine);
         }
     }
 }
