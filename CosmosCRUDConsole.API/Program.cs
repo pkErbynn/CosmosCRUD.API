@@ -5,12 +5,17 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Documents.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
-//This demo dives into leveraging Cosmos SDK to;
-//- create databases and collections
-//- write to these collections, and 
-//- read documents from collections from db
+//Using async/await and Task.WhenAll to improve the overall speed of your C# code
+
+//Mostly, a single method or service 
+//    which awaits the outputs of numerous methods which are marked as asynchronous.
+
+//If three methods don’t seem to depend on each other in any way, and since they’re all asynchronous methods, 
+//    it’s possible to run them in parallel.
 
 namespace CosmosCRUDConsole.API
 {
@@ -21,51 +26,65 @@ namespace CosmosCRUDConsole.API
         private static readonly string DatabaseId = "Tourism";
         private static readonly string CastlesCollection = "Castles";
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            // Create the client connection
-            var client = new DocumentClient(
-                new Uri(CosmosEndpoint),
-                EmulatorKey,
-                new ConnectionPolicy
-                {
-                    ConnectionMode = ConnectionMode.Direct,
-                    ConnectionProtocol = Protocol.Tcp
-                });
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            // Set up database and collection Uris
-            var databaseUri = UriFactory.CreateDatabaseUri(DatabaseId);
-            var castleCollectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseId, CastlesCollection);
-            var castlesCollection = new DocumentCollection { Id = CastlesCollection };
+            // This method takes about 2.5s to run
+            //var complexSum = await SlowAndComplexSumAsync();
 
-            // Create a new db in cosmos
-            client.CreateDatabaseIfNotExistsAsync(new Database { Id = DatabaseId }).Wait();  // .Result makes it sync
+            //// The elapsed time will be approximately 2.5s so far
+            //Console.WriteLine("Time elapsed when sum completes..." + stopwatch.Elapsed);
 
-            // Create new Container(Collection/Table) inside db to store Landmarks
-             client.CreateDocumentCollectionIfNotExistsAsync(databaseUri, castlesCollection).Wait(); ;
+            // This method takes about 4s to run
+            //var complexWord = await SlowAndComplexWordAsync();
+
+            //// The elapsed time at this point will be about 6.5s
+            //Console.WriteLine("Time elapsed when both complete..." + stopwatch.Elapsed);
 
 
-            // Create Item/Document/Row in Collection to be stored...specifying db and collection to target
-            var elCastle = new Castle { Name = "Elmina Castle" };
+            //WHEN ALL
+            var complexWord = SlowAndComplexWordAsync();
+            var complexSum =  SlowAndComplexSumAsync();
+            // running them in parallel should take about 4s to complete
+            await Task.WhenAll(complexSum, complexWord);
+            Console.WriteLine("Time elapsed when both complete..." + stopwatch.Elapsed);
 
-            client.CreateDocumentAsync(castleCollectionUri, elCastle).Wait();
 
 
-            // READING DATA....USING STRING QUERY
+            // These lines are to prove the outputs are as expected,
+            // i.e. 300 for the complex sum and "ABC...XYZ" for the complex word
+            Console.WriteLine("Result of complex sum = " + complexSum);
+            Console.WriteLine("Result of complex letter processing " + complexWord);
 
-            var cosmosService = new CosmosService<Castle>
-            {
-                DocumentClient = client,
-                DatabaseId = DatabaseId,
-                CollectionId = CastlesCollection
-            };
-
-            var castles = cosmosService.GetItemsAsync(e => e.Name == "Elmina Castle").Result;
-            Console.WriteLine("BEFORE 4EACH");
-            castles.ToList().ForEach(Console.WriteLine);
-
-            var castleMatches = cosmosService.GetItemsAsync(e => e.Name.StartsWith("El")).Result;
-            castleMatches.ToList().ForEach(Console.WriteLine);
+            Console.Read();
         }
+
+        // add delays to deliberately slow it down..... 2.5s to run - 25 by 0.1
+        private static async Task<int> SlowAndComplexSumAsync()
+        {
+            int sum = 0;
+            foreach (var counter in Enumerable.Range(0, 25))
+            {
+                sum += counter;
+                await Task.Delay(100);
+            }
+
+            return sum;
+        }
+
+        private static async Task<string> SlowAndComplexWordAsync()
+        {
+            var word = string.Empty;
+            foreach (var counter in Enumerable.Range(65, 26))
+            {
+                word = string.Concat(word, (char)counter);
+                await Task.Delay(150);
+            }
+
+            return word;
+        }
+        
     }
 }
