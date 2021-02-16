@@ -114,10 +114,15 @@ namespace CosmosCRUDConsole.API.Services
 
 
         // Get By Id
-        public IQueryable<Castle> GetById(string id)
+        public async Task<Castle> GetById(string id)
         {
-            return client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId),
-                new FeedOptions { MaxItemCount = 3 }).Where(i => i.Id == id);
+            return await client.ReadDocumentAsync<Castle>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
+        }
+
+        public async Task<Castle> GetCastleById(string id)  // has issue
+        {
+            var result = client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId)).Where(i => i.Id == id).FirstOrDefault();
+            return await Task.FromResult(result);
         }
 
 

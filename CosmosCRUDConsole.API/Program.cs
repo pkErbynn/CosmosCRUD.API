@@ -51,13 +51,13 @@ namespace CosmosCRUDConsole.API
             //Console.WriteLine(r3.Count());
             //r3.ToList().ForEach(Console.WriteLine);
 
-            var r4 = cosmosService.GetByName("Elmina Castle");
-            Console.WriteLine(r4.Count());
-            r4.ToList().ForEach(Console.WriteLine);
+            //var r4 = cosmosService.GetByName("Elmina Castle");
+            //Console.WriteLine(r4.Count());
+            //r4.ToList().ForEach(Console.WriteLine);
 
-            Console.WriteLine("Id");
-            var c = cosmosService.GetById("142f8592-a37e-44b6-b598-f917bbf8e33e");
-            Console.WriteLine(c.ToString());
+            Console.WriteLine("get by Id");
+            var c = cosmosService.GetById("142f8592-a37e-44b6-b598-f917bbf8e33e").Result;
+            Console.WriteLine(c);
 
             //var r = cosmosService.GetData<Castle>().Result;
             //Console.WriteLine(r.ToString());
@@ -69,8 +69,11 @@ namespace CosmosCRUDConsole.API
             //var r2 = cosmosService.DeleteUserAsync(docId).Result;
             //Console.WriteLine(r2);
 
+
             // UPDATE DATA
-            cosmosService.UpdateCastleAync("", new Castle { Id = "111", Name = "ChristianBorg Castle" });
+            //var u = cosmosService.UpdateCastleAync("c846114f-a295-4ad7-97be-0fb8812a1b4d", new Castle { Id = "111", Name = "ChristianBorg Castle" }).Result;
+            //Console.WriteLine("Updated with: " + u);
+
 
             Console.Read();
         }
