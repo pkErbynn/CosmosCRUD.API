@@ -119,11 +119,11 @@ namespace CosmosCRUDConsole.API.Services
             return await client.ReadDocumentAsync<Castle>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
         }
 
-        public async Task<Castle> GetCastleById(string id)  // has issue
-        {
-            var result = client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId)).Where(i => i.Id == id).FirstOrDefault();
-            return await Task.FromResult(result);
-        }
+        //public async Task<Castle> GetCastleById(string id)  // has issue
+        //{
+        //    var result = client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId)).Where(i => i.Id == id).FirstOrDefault();
+        //    return await Task.FromResult(result);
+        //}
 
 
         // Get By Name
