@@ -22,13 +22,15 @@ namespace CosmosCRUDConsole.API
         static void Main(string[] args)
         {
 
-// DB SETUPS
+            // DB SETUPS
             var cosmosService = new CosmosConfigService();
 
             //var db = cosmosService.VarifyDatabaseCreated();
             //var coll = cosmosService.VerifyCollectionCreation();
-            //var doc = cosmosService.VerifyDocumentCreation(new Castle { Name = "Elmina Castle" });
-            //var doc2 = cosmosService.VerifyDocumentCreation(new Castle { Name = "Cape Coast"});
+
+            // POST DATA
+            //var doc = cosmosService.Post(new Castle { Name = "Elmina Castle" });
+            //var doc2 = cosmosService.Post(new Castle { Name = "Cape Coast" });
 
             //Task.FromResult(db, coll, doc);
 
@@ -36,7 +38,7 @@ namespace CosmosCRUDConsole.API
             //Console.WriteLine("IsCollectionCreated: " + coll.Result);
             //Console.WriteLine("IsDocumentCreated: " + doc2.Result);
 
-// FETCH DATA
+            // FETCH DATA
             //var castles = cosmosService.GetItemsAsync<Castle>(e => e.Name == "Elmina Castle").Result;
             //Console.WriteLine("BEFORE 4EACH");
             //Console.WriteLine("Count: ", castles.ToList().Count);
@@ -53,15 +55,22 @@ namespace CosmosCRUDConsole.API
             Console.WriteLine(r4.Count());
             r4.ToList().ForEach(Console.WriteLine);
 
+            Console.WriteLine("Id");
+            var c = cosmosService.GetById("142f8592-a37e-44b6-b598-f917bbf8e33e");
+            Console.WriteLine(c.ToString());
+
             //var r = cosmosService.GetData<Castle>().Result;
             //Console.WriteLine(r.ToString());
             //Console.WriteLine(r.Result);
 
 
-// DELETE DATA
+            // DELETE DATA
             //string docId = "0ad0182f-847f-475b-8486-d16fea58e37a";
             //var r2 = cosmosService.DeleteUserAsync(docId).Result;
             //Console.WriteLine(r2);
+
+            // UPDATE DATA
+            cosmosService.UpdateCastleAync("", new Castle { Id = "111", Name = "ChristianBorg Castle" });
 
             Console.Read();
         }

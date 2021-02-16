@@ -35,6 +35,8 @@ namespace CosmosCRUDConsole.API.Services
                });
         }
 
+
+        // Build Collection
         public async Task<bool> VarifyDatabaseCreated()
         {
             try
@@ -44,6 +46,7 @@ namespace CosmosCRUDConsole.API.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error occured while creating DB: "+ ex.Message);
                 return false;
             }
         }
@@ -60,37 +63,35 @@ namespace CosmosCRUDConsole.API.Services
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error occured: " + ex.Message);
                 return false;
             }
         }
 
-        public async Task<bool> VerifyDocumentCreation<T>(T documentName) where T : class
+
+        // Post data
+        public async Task<bool> Post<T>(T item) where T : class
         {
             var castleCollectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId);
 
             try
             {
-                await client.CreateDocumentAsync(castleCollectionUri, documentName);  // upsert 
+                await client.CreateDocumentAsync(castleCollectionUri, item);  // upsert 
                 return true;
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Error occured: " + ex.Message);
                 return false;
             }
         }
 
 
-         // FETCH
+         // Get data
         public IQueryable<Castle> GetCastleQuery()
         {
             return client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId),
                 new FeedOptions { MaxItemCount = 20 });
-        }
-
-        public IQueryable<Castle> GetByName(string name)
-        {
-            return client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId),
-                new FeedOptions { MaxItemCount = 3 }).Where((i) => i.Name == name);
         }
 
         public async Task<IEnumerable<T>> GetItemsAsync<T>(Expression<Func<T, bool>> predicate) where T : class
@@ -111,6 +112,23 @@ namespace CosmosCRUDConsole.API.Services
             return results;
         }
 
+
+        // Get By Id
+        public IQueryable<Castle> GetById(string id)
+        {
+            return client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId),
+                new FeedOptions { MaxItemCount = 3 }).Where(i => i.Id == id);
+        }
+
+
+        // Get By Name
+        public IQueryable<Castle> GetByName(string name)  
+        {
+            return client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId),
+                new FeedOptions { MaxItemCount = 3 }).Where( i => i.Name == name);
+        }
+
+
         // not recommended 
         //public async Task<dynamic> GetData<T>() where T : class
         //{
@@ -129,6 +147,23 @@ namespace CosmosCRUDConsole.API.Services
         //}
 
 
+        // Update
+        public async Task<Castle> UpdateCastleAync(string id, Castle castle)
+        {
+            try
+            {
+                var collectionUri = UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id);
+
+                var result = await client.ReplaceDocumentAsync(collectionUri, castle);
+                return (dynamic)result.Resource;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("error occured"+ e.Message);
+                return new Castle();
+            }
+        }
+
         // DELETE
         public async Task<Castle> DeleteUserAsync(string id)
         {
@@ -146,7 +181,7 @@ namespace CosmosCRUDConsole.API.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error occured: "); ;
+                Console.WriteLine("Error occured wile deleting item: " + ex.Message) ;
                 return null;
             }
         }
