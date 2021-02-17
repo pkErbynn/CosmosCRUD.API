@@ -116,6 +116,20 @@ namespace CosmosCRUDConsole.API.Services
         // Get By Id
         public async Task<Castle> GetById(string id)
         {
+            //alt a
+            //var doc = await client.ReadDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
+            //Castle castle = (dynamic)doc.Resource;
+            //return castle;
+
+            //alt c
+            //var castleDoc = client.CreateDocumentQuery<Castle>(UriFactory.CreateDocumentCollectionUri(DatabaseId, CollectionId))
+            //                        .Where(e => e.Id == id)
+            //                        .AsEnumerable()
+            //                        .FirstOrDefault();
+            
+            //return await Task.FromResult(castleDoc);
+
+            //alt d
             return await client.ReadDocumentAsync<Castle>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
         }
 
