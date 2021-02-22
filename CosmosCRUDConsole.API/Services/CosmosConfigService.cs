@@ -130,7 +130,8 @@ namespace CosmosCRUDConsole.API.Services
             //return await Task.FromResult(castleDoc);
 
             //alt d
-            return await client.ReadDocumentAsync<Castle>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
+            Castle castle =  await client.ReadDocumentAsync<Castle>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
+            return castle;
         }
 
         //public async Task<Castle> GetCastleById(string id)  // has issue
