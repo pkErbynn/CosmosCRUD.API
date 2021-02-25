@@ -17,5 +17,15 @@ namespace CosmosCRUDConsole.API.Models
         {
             return JsonConvert.SerializeObject(this);
         }
+
+        public static Castle CastleFactory(string id, string name)
+        {
+            var tempCastle = new Castle
+            {
+                Id = id,
+                Name = name
+            };
+            return tempCastle;
+        }
     }
 }
