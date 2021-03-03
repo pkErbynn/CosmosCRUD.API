@@ -1,0 +1,79 @@
+// user count on Enumerable or list not found 
+// mostly use IEnumerable
+if(users.count != 0){
+    return Ok(users)
+}
+return NotFount();
+// ==========
+// async called in notn-async
+public async Task<IEnum<User>> getUsersAsync(){
+	var res = await _metaDB.getAllEntities();
+    return res;
+}
+
+// Caller non-async
+public async Task<IEnum<User>> getUsers(){
+	var res = getUsersAsync();
+    res.Wait();
+    return res.Result;
+}
+
+// ===========
+// non-async called in async
+// can be used at service layer to call non-async methods
+public async Task CreatBlobAsync(Blob blob){
+    await Task.Run(() => CreatBlob());
+}
+
+// ==========
+// turning processes an async
+public async Task<User> GetUserAsyn(Blob blob){
+    var user = new User{
+        name = "Erb",
+    }
+    await Task.FromResult(user); 
+}
+
+// =========
+can throw exception on condition that will be caught later
+if(yes){
+    works
+}else{
+    throw new CustomException("already exist")
+}
+
+// =========
+Post HTTP verb 
+returns CreatedAtAction("object")
+
+// =======
+// can have try-catch and null verification same time
+_db.getUser(){
+    if(File.Exist){
+        return new User()
+    }
+    return null;
+}
+
+public async Task<ActionResult> GetSomeUserAsyn(Blob blob){
+
+    User user
+    try{
+        user = await _db.getUser();
+    }
+    catch(SomeExeThrown e){
+        return BadRequest(e.data)
+    }
+
+    if(user == null){
+        return NotFount()
+    }
+
+    return Ok(user)
+}
+
+Callee can have if condition with fine flow and 
+an else with Exeption thrown
+then...
+Caller can use try-catch to catch that exception
+and outside block of try-catch to return Ok()

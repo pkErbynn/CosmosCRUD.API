@@ -1,7 +1,12 @@
 ﻿using CosmosCRUDConsole.API.Models;
+using CosmosCRUDConsole.API.Services;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 //This demo dives into leveraging Cosmos SDK to;
 //- create databases and collections
@@ -12,54 +17,65 @@ namespace CosmosCRUDConsole.API
 {
     class Program
     {
-        private static readonly string CosmosEndpoint = "https://localhost:8081";
-        private static readonly string EmulatorKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
-        private static readonly string DatabaseId = "Tourism";
-        private static readonly string CastlesCollection = "Castles";
+      
 
         static void Main(string[] args)
         {
-            // Create the client connection
-            var client = new DocumentClient(
-                new Uri(CosmosEndpoint),
-                EmulatorKey,
-                new ConnectionPolicy
-                {
-                    ConnectionMode = ConnectionMode.Direct,
-                    ConnectionProtocol = Protocol.Tcp
-                });
 
-            // Create a new db in cosmos
-            var dbCreationResult = client.CreateDatabaseIfNotExistsAsync(new Database { Id = DatabaseId }).Result;  // .Result makes it sync
+            // DB SETUPS
+            var cosmosService = new CosmosConfigService();
 
-            Console.WriteLine("The database Id created is: " + dbCreationResult.Resource.Id);
+            //var db = cosmosService.VarifyDatabaseCreated();
+            //var coll = cosmosService.VerifyCollectionCreation();
 
-            // Create new Container(Collection/Table) inside db to store Landmarks
-            var collectionCreationResult = client.CreateDocumentCollectionIfNotExistsAsync(
-                UriFactory.CreateDatabaseUri(DatabaseId), 
-                new DocumentCollection { Id = CastlesCollection }).Result;
+            // POST DATA
+            //var doc = cosmosService.Post(new Castle { Name = "Elmina Castle" });
+            //var doc2 = cosmosService.Post(new Castle { Name = "Cape Coast" });
 
-            Console.WriteLine("The collection created has the ID: " + collectionCreationResult.Resource.Id);
+            //Task.FromResult(db, coll, doc);
 
-            // Create Item/Document/Row in Collection to be stored...specifying db and collection to target
-            var elCastle = new Castle { Name = "Elmina Castle" };
+            //Console.WriteLine("IsDBCreated: " + db.Result);
+            //Console.WriteLine("IsCollectionCreated: " + coll.Result);
+            //Console.WriteLine("IsDocumentCreated: " + doc2.Result);
 
-            var itemResult = client.CreateDocumentAsync(
-                UriFactory.CreateDocumentCollectionUri(DatabaseId, CastlesCollection),
-                elCastle).Result;
+            // FETCH DATA
+            //var castles = cosmosService.GetItemsAsync<Castle>(e => e.Name == "Elmina Castle").Result;
+            //Console.WriteLine("BEFORE 4EACH");
+            //Console.WriteLine("Count: ", castles.ToList().Count);
+            //castles.ToList().ForEach(Console.WriteLine);
 
-            Console.WriteLine("The document has been created with the ID:  " + itemResult.Resource.Id);
+            //var castleMatches = cosmosService.GetItemsAsync(e => e.Name.StartsWith("El")).Result;
+            //castleMatches.ToList().ForEach(Console.WriteLine);
+
+            //var r3 = cosmosService.GetCastleQuery();
+            //Console.WriteLine(r3.Count());
+            //r3.ToList().ForEach(Console.WriteLine);
+
+            //var r4 = cosmosService.GetByName("Elmina Castle");
+            //Console.WriteLine(r4.Count());
+            //r4.ToList().ForEach(Console.WriteLine);
+
+            Console.WriteLine("get by Id");
+            var c = cosmosService.GetById("142f8592-a37e-44b6-b598-f917bbf8e33e").Result;
+            Console.WriteLine(c);
+
+            //var r = cosmosService.GetData<Castle>().Result;
+            //Console.WriteLine(r.ToString());
+            //Console.WriteLine(r.Result);
 
 
-            // READING DATA....targeted db, collection and id of data to read provided
-            var document = client.ReadDocumentAsync<Castle>(
-                UriFactory.CreateDocumentUri(DatabaseId, CastlesCollection, itemResult.Resource.Id)).Result;
+            // DELETE DATA
+            //string docId = "0ad0182f-847f-475b-8486-d16fea58e37a";
+            //var r2 = cosmosService.DeleteUserAsync(docId).Result;
+            //Console.WriteLine(r2);
 
-            // convert db document result to Castle POCO
-            Castle castle = (dynamic)document;      // "dynamic" does magic  ;-)
 
-            Console.WriteLine("Castle retrieved: " + castle);
+            // UPDATE DATA
+            //var u = cosmosService.UpdateCastleAync("c846114f-a295-4ad7-97be-0fb8812a1b4d", new Castle { Id = "111", Name = "ChristianBorg Castle" }).Result;
+            //Console.WriteLine("Updated with: " + u);
 
+
+            Console.Read();
         }
     }
 }
