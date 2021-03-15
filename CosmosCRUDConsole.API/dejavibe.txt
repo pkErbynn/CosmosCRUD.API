@@ -1,3 +1,75 @@
+Intro
+-----
+Redesign of DB
+In an upcoming issue on "Runnig diff layouts on diff machines"
+Spend some time thinking about your data model to get the most of the service 
+in terms of performance and scalability and lowest cost.
+
+Case Scenarios...
+
+1. How is data going to be stored? 
+2. How is your application going to retrieve and query data? 
+3. Is your application read-heavy, or write-heavy?
+
+
+1. Partitioning...
+Enables horizantal scaling to scale data.
+..from mb to gb as data grows
+
+Within collection, docs split into groups logical partitioning
+
+talks all data with same partition id and group them 
+so that all get querries will get result from one partition
+
+
+2. Embeded
+Why
+...1:few relationship btn entities
+...bound as to how the profile data grows
+...profiles queried together
+fewer server round trips while still maintaining a good level of performance.
+
+3. Read-heavy
+Number of request is higher than number of write
+Make sense to Improve read performance by making write more expensive
+
+
+Future
+---------
+Re-implement all features
+"Runnig diff layouts on diff machines"
+
+
+Questions
+--------
+Could a user have about up to a 1000 profiles?
+
+
+Modelling to suite an upcoming feature on 'Run different layouts on diff matchines'
+============================
+
+Project Presentation Outline
+
+Your presentation outline should address these topics, and proceed in this order:
+
+Introduction – summarize your project’s purpose and platform
+
+Goals (Objectives) & Constraints – related programs/ projects / apps that you knew of going into the project or that you discovered while working on your project. What were the limitations going in.
+
+Ethics (If applicable) – Any ethical concerns?
+
+Challenges – Both expected and encountered
+
+Demo – Show us something of your project. It doesn’t have to be an application. It could be a handout.
+
+Accomplishments/What you learned – Which objectives did you meet? Which ones weren’t you able to meet in the time provided? How is your project or what you learned important?
+
+Future Work – Will you continue with your project in any form? If so, how?
+
+Leave time for questions
+
+
+=================
 // user count on Enumerable or list not found 
 // mostly use IEnumerable
 if(users.count != 0){
@@ -11,16 +83,21 @@ public async Task<IEnum<User>> getUsersAsync(){
     return res;
 }
 
-// Caller non-async
-public async Task<IEnum<User>> getUsers(){
+// ===========
+// non-async method calling async method
+public Task<IEnum<User>> getUsers(){
 	var res = getUsersAsync();
     res.Wait();
     return res.Result;
 }
 
 // ===========
-// non-async called in async
+// async method calling non-async method
 // can be used at service layer to call non-async methods
+public async Task<IEnum<User>> GetUsersAsync(){
+    return await Task.Run(() => GetUsers());
+}
+//Eg. 2
 public async Task CreatBlobAsync(Blob blob){
     await Task.Run(() => CreatBlob());
 }
