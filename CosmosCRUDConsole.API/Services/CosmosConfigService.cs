@@ -131,6 +131,8 @@ namespace CosmosCRUDConsole.API.Services
 
             //alt d
             Castle castle =  await client.ReadDocumentAsync<Castle>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id));
+            //Castle castle2 =  client.ReadDocumentAsync<Castle>(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, id)).Result.Document;
+            
             return castle;
         }
 
