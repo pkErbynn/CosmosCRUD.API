@@ -209,8 +209,19 @@ namespace CosmosCRUDConsole.API.Services
         }
 
         
-
-
         // continue explore here - https://github.com/nhandrew/cosmosdbrestapi/blob/master/Controllers/ItemController.cs
+
+
+        // Date playgame
+        //public async Task<IEnumerable<SomeObj>> DateTest()
+        //{
+        //    var doc = await client.ReadDocumentAsync(UriFactory.CreateDocumentUri(DatabaseId, CollectionId, "mockid"));
+        //    SomeObj so = (dynamic)doc.Resource;
+
+        //    var dateInput = "2021-03-18 22:03:44";  //  or can be "2021-03-18T22:03:44"...strinfify version eleminate the mid "T
+        //    var dateformat = DateTimeOffset.Parse(dateInput).UtcDateTime;       // convert to started format dd/mm/yyyy
+
+        //    //nb: reads format like "2021-03-18T22:03:44" as this format, "dd/mm/yyyy 2:03:44" 
+        //}
     }
 }
